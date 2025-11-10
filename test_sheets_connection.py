@@ -22,7 +22,7 @@ required_vars = {
     'GOOGLE_CLIENT_EMAIL': os.environ.get('GOOGLE_CLIENT_EMAIL'),
     'GOOGLE_CLIENT_ID': os.environ.get('GOOGLE_CLIENT_ID'),
     'GOOGLE_CERT_URL': os.environ.get('GOOGLE_CERT_URL'),
-    'GOOGLE_SHEET_NAME': os.environ.get('GOOGLE_SHEET_NAME', 'Leads - Divorce Bot')
+    'GOOGLE_SHEET_NAME': os.environ.get('GOOGLE_SHEET_NAME', 'Leads - Divorce Bot'),
     'GOOGLE_SHEET_URL': os.environ.get('GOOGLE_SHEET_URL')
 }
 
