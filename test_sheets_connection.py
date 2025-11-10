@@ -105,36 +105,43 @@ except Exception as e:
 print("\n📊 Крок 4: Відкриття таблиці")
 print("-" * 60)
 
-sheet_name = required_vars['GOOGLE_SHEET_NAME']
-print(f"Спроба відкрити таблицю: '{sheet_name}'")
+# --- НОВЫЙ НАДЕЖНЫЙ КОД ---
+# (Убедись, что 'GOOGLE_SHEET_URL' есть в твоем словаре required_vars)
+sheet_url = required_vars.get('GOOGLE_SHEET_URL') 
+
+if not sheet_url:
+    print("❌ КРИТИЧНА ПОМИЛКА: Не знайдено 'GOOGLE_SHEET_URL' в environment variables!")
+    print("Додай цю змінну в налаштуваннях Render.")
+    exit(1)
+
+print(f"Спроба відкрити таблицю за URL: {sheet_url}")
 
 try:
-    sheet = client.open(sheet_name).sheet1
-    print(f"✅ Таблиця '{sheet_name}' успішно відкрита!")
+    # Открываем по URL
+    sheet = client.open_by_url(sheet_url).sheet1
+    print(f"✅ Таблиця '{sheet.title}' успішно відкрита по URL!")
     
-    # Перевіряємо заголовки
+    # (Дальнейшая проверка заголовков остается как была)
     headers = sheet.row_values(1)
     if headers:
         print(f"\n📋 Заголовки таблиці:")
         for i, header in enumerate(headers, 1):
             print(f"   {i}. {header}")
     else:
-        print("⚠️  УВАГА: Таблиця порожня (немає заголовків)")
-    
-except gspread.SpreadsheetNotFound:
-    print(f"❌ ТАБЛИЦЯ НЕ ЗНАЙДЕНА: '{sheet_name}'")
-    print("\nМожливі причини:")
-    print("1. Назва таблиці написана неправильно (перевірте регістр і пробіли)")
-    print("2. Таблиця НЕ поділена з Service Account email")
-    print(f"\nПеревірте, чи таблиця поділена з: {required_vars['GOOGLE_CLIENT_EMAIL']}")
-    print("\nЯк поділитися:")
-    print("1. Відкрийте таблицю в Google Sheets")
-    print("2. Натисніть 'Share' (Поділитися)")
-    print("3. Додайте email вище")
-    print("4. Виберіть права: 'Editor' (Редактор)")
+        print("⚠️   УВАГА: Таблиця порожня (немає заголовків)")
+
+except gspread.exceptions.APIError as e:
+    # Эта ошибка теперь будет, если API не включен
+    print(f"❌ ПОМИЛКА API GOOGLE: {e}")
+    print("Переконайся, що 'Google Sheets API' увімкнено в Google Cloud.")
     exit(1)
-    
+except gspread.exceptions.SpreadsheetNotFound:
+    print(f"❌ ТАБЛИЦЯ НЕ ЗНАЙДЕНА ЗА URL: {sheet_url}")
+    print("Можливо, URL неправильний, АБО таблиця не поділена з email:")
+    print(f"{required_vars.get('GOOGLE_CLIENT_EMAIL')}")
+    exit(1)
 except Exception as e:
+    # Ловим другие ошибки
     print(f"❌ ІНША ПОМИЛКА: {type(e).__name__}: {e}")
     exit(1)
 
